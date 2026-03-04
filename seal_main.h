@@ -15,6 +15,9 @@ struct seal_information
     string gbk_code;
 };
 
+// 全局 seal 实例（在 seal_main.cpp 定义）
+extern seal_information seal;
+
 //////background introduction
 void INTRODUCE();  
 

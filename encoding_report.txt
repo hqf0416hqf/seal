@@ -1,0 +1,11 @@
+Checking encodings and attempting conversion (backup in backup_src/)
+module1_tnteraction_pre.cpp: iso-8859-1
+converted module1_tnteraction_pre.cpp from GBK to UTF-8
+module2.cpp: utf-8
+module2.cpp already utf-8
+module3.cpp: utf-8
+module3.cpp already utf-8
+seal_main.cpp: utf-8
+seal_main.cpp already utf-8
+seal_main.h: utf-8
+seal_main.h already utf-8
