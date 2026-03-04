@@ -12,11 +12,11 @@ seal_information seal;
 int main(int argc,char *argv[]){
 
     char a[ROW][COL+1];
-    INTRODUCE();
-    USE_INTERRACTION(seal.character,seal.font_choice,seal.color_choice);
+    INTRODUCE(); 
+    USE_INTERRACTION(seal.character,seal.font_choice,seal.color_choice); //
     for (int i = 0; i < 4; i++)
     {
-        string gbk_code=character_gdk(character+i, font_choice);
+        seal.gbk_code=character_gdk(seal.character+i*2); //将每个汉字转化成GBK编码
 
         bool statue =load_DotMatrix(seal.font_choice,gbk_code,a[ROW][COL+1])
         if(statue)
@@ -27,7 +27,9 @@ int main(int argc,char *argv[]){
         return 1;
         }
        FONT_IMPORT()
-       concat4()
-      BMP_GENERATOR()    
+       
     }//for遍历，四个汉字依次处理
+
+    BMP_GENERATOR();
+    concat4() ;
 }
