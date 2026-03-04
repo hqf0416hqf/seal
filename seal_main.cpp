@@ -98,48 +98,31 @@ int main(int argc,char *argv[]){
         cout << "[DIAG] no all-white columns found.\n";
     }
 
-    // 分析每列白色比例，找出白色密集的列（例如 >75% 白）
-    vector<pair<int,int>> heavy_white_cols; // (col, white_count)
-    for (int c = 0; c < 2*COL; c++) {
-        int wc = 0;
-        for (int r = 0; r < 2*ROW; r++) if (back[r][c] == "FF FF FF") wc++;
-        if (wc * 100 >= (2*ROW) * 75) heavy_white_cols.emplace_back(c, wc);
-    }
-    if (!heavy_white_cols.empty()) {
-        cout << "[DIAG] columns with >75% white: count=" << heavy_white_cols.size() << " examples:";
-        for (size_t i = 0; i < heavy_white_cols.size() && i < 40; ++i) cout << " (" << heavy_white_cols[i].first << "," << heavy_white_cols[i].second << ")";
-        cout << "\n";
-    } else {
-        cout << "[DIAG] no columns with >75% white detected.\n";
-    }
+    // NOTE: previous automatic quadrant-based filling was causing new artifacts
+    // by copying strokes across character boundaries. We keep diagnostics only
+    // here and do not modify `back`. To reduce seams, we should fix the source
+    // (font parsing/concat/char_rgb) rather than aggressive post-copying.
 
-    // 修复策略：对高度白色的列进行邻域填充（用左边或右边非白列填充），以去除明显的竖线条纹
-    int filled_cols = 0;
-    for (auto &p : heavy_white_cols) {
-        int c = p.first;
-        // 找到最近的左侧非白列作为填充源
-        int src = -1;
-        for (int d = 1; d < 2*COL; d++) {
-            int lj = c - d;
-            int rj = c + d;
-            if (lj >= 0) {
-                // check if lj is not heavy white
-                int wc = 0;
-                for (int r = 0; r < 2*ROW; r++) if (back[r][lj] == "FF FF FF") wc++;
-                if (wc * 100 < (2*ROW) * 75) { src = lj; break; }
-            }
-            if (rj < 2*COL) {
-                int wc = 0;
-                for (int r = 0; r < 2*ROW; r++) if (back[r][rj] == "FF FF FF") wc++;
-                if (wc * 100 < (2*ROW) * 75) { src = rj; break; }
+    // 对合成画布做轻量的填充：只填充被单像素或窄列分隔的白色点，避免跨字块的大范围拷贝
+    auto simple_close = [&](int iterations){
+        for (int it = 0; it < iterations; ++it) {
+            string tmp[2*ROW][2*COL+1];
+            for (int r = 0; r < 2*ROW; ++r) for (int c = 0; c < 2*COL; ++c) tmp[r][c] = back[r][c];
+            for (int r = 0; r < 2*ROW; ++r) {
+                for (int c = 0; c < 2*COL; ++c) {
+                    if (tmp[r][c] == "FF FF FF") {
+                        // 检查四邻域
+                        if (c-1 >= 0 && tmp[r][c-1] != "FF FF FF") back[r][c] = tmp[r][c-1];
+                        else if (c+1 < 2*COL && tmp[r][c+1] != "FF FF FF") back[r][c] = tmp[r][c+1];
+                        else if (r-1 >= 0 && tmp[r-1][c] != "FF FF FF") back[r][c] = tmp[r-1][c];
+                        else if (r+1 < 2*ROW && tmp[r+1][c] != "FF FF FF") back[r][c] = tmp[r+1][c];
+                    }
+                }
             }
         }
-        if (src != -1) {
-            for (int r = 0; r < 2*ROW; r++) back[r][c] = back[r][src];
-            filled_cols++;
-        }
-    }
-    if (filled_cols > 0) cout << "[DIAG] filled " << filled_cols << " heavy-white columns by neighbor copying.\n";
+    };
+
+    simple_close(2); // 两次迭代，填补单列/单像素缝隙
 
     // 导出 BMP 文件
     BMP_GENERATOR(string("seal.bmp"), back);

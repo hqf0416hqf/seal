@@ -30,7 +30,7 @@ void BMP_GENERATOR(string FILENAME, string CANVAS[2*ROW][2*COL+1]){
 
     const int LOGICAL_WIDTH = 2 * COL;    // 逻辑画布列数（每个元素代表一个逻辑像素）
     const int LOGICAL_HEIGHT = 2 * ROW;   // 逻辑画布行数
-    const int SCALE = 12; // 每个逻辑像素在输出中放大倍数（宽高各），放大两倍
+    const int SCALE = 6; // 每个逻辑像素在输出中放大倍数（宽高各）
     const int WIDTH = LOGICAL_WIDTH * SCALE;    // 实际输出宽度（像素）
     const int HEIGHT = LOGICAL_HEIGHT * SCALE;  // 实际输出高度（像素）
     int ROWSIZE = (3 * WIDTH + 3) / 4 * 4;        // 每行字节数（4字节对齐）

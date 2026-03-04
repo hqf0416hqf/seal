@@ -123,15 +123,15 @@ void concat4(string a[ROW][COL+1], string b[ROW][COL+1], string c[ROW][COL+1], s
     for (int t = 0; t < thickness; t++) {
         // 上边和下边
         for (int x = 0; x < width; x++) {
-            // 上
-            back[t][x] = seal.color_choice;
+            // 上：只在当前像素是白色时替换，避免覆盖字形笔画
+            if (back[t][x] == string("FF FF FF")) back[t][x] = seal.color_choice;
             // 下
-            back[height - 1 - t][x] = seal.color_choice;
+            if (back[height - 1 - t][x] == string("FF FF FF")) back[height - 1 - t][x] = seal.color_choice;
         }
         // 左边和右边
         for (int y = 0; y < height; y++) {
-            back[y][t] = seal.color_choice;
-            back[y][width - 1 - t] = seal.color_choice;
+            if (back[y][t] == string("FF FF FF")) back[y][t] = seal.color_choice;
+            if (back[y][width - 1 - t] == string("FF FF FF")) back[y][width - 1 - t] = seal.color_choice;
         }
     }
 
